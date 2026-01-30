@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Me-API Playground</title>
+</head>
+<body>
+  <h1>Candidate Profile</h1>
+
+  <section id="profile"></section>
+
+  <h2>Projects</h2>
+
+  <input
+    type="text"
+    id="skillInput"
+    placeholder="Search projects by skill (e.g. python)"
+  />
+  <button onclick="searchBySkill()">Search</button>
+
+  <ul id="projects"></ul>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    async function loadProfile() {
+      const res = await fetch(`${API_BASE}/profile`);
+      const data = await res.json();
+
+      document.getElementById("profile").innerHTML = `
+        <p><strong>Name:</strong> ${data.name}</p>
+        <p><strong>Email:</strong> ${data.email}</p>
+        <p><strong>Education:</strong> ${data.education}</p>
+        <p>
+          <a href="${data.github}" target="_blank">GitHub</a> |
+          <a href="${data.linkedin}" target="_blank">LinkedIn</a> |
+          <a href="${data.portfolio}" target="_blank">Portfolio</a>
+        </p>
+      `;
+    }
+
+    async function loadProjects(url = `${API_BASE}/projects`) {
+      const res = await fetch(url);
+      const projects = await res.json();
+
+      const list = document.getElementById("projects");
+      list.innerHTML = "";
+
+      projects.forEach(p => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${p.title}</strong><br/>
+          ${p.description}<br/>
+          <em>Skills:</em> ${p.skills}<br/>
+          <a href="${p.link}" target="_blank">Project Link</a>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function searchBySkill() {
+      const skill = document.getElementById("skillInput").value;
+      if (!skill) {
+        loadProjects();
+      } else {
+        loadProjects(`${API_BASE}/projects?skill=${skill}`);
+      }
+    }
+
+    // Load data on page load
+    loadProfile();
+    loadProjects();
+  </script>
+</body>
+</html>
