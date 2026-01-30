@@ -3,10 +3,13 @@ from sqlalchemy.orm import Session
 from .database import engine, SessionLocal
 from . import models
 from fastapi.middleware.cors import CORSMiddleware
+from .seed import seed_if_empty
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+seed_if_empty()
 
 # Setup for assessment purposes (in a production environment, we need to configure CORS appropriately)
 app.add_middleware(
